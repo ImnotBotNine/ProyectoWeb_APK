@@ -1,8 +1,13 @@
 // Servicios para conectarse a la API propia (FastAPI + PostgreSQL).
 // Sigue el mismo esquema que itemsApi.js de la guía: una función que hace el fetch
 // y un objeto por recurso con sus operaciones.
-const URL_API = "http://127.0.0.1:8000";
-const URL_USUARIOS = "http://127.0.0.1:8001";
+import { Capacitor } from "@capacitor/core";
+
+// Hito 4 (guía de Capacitor): la dirección de las APIs depende de dónde corre React.
+// Se configuran en frontend/.env (ver .env.example).
+const esAndroid = Capacitor.getPlatform() === "android";
+const URL_API = esAndroid ? import.meta.env.VITE_API_ANDROID : import.meta.env.VITE_API_WEB;
+const URL_USUARIOS = esAndroid ? import.meta.env.VITE_USUARIOS_ANDROID : import.meta.env.VITE_USUARIOS_WEB;
 
 // Id de quien tiene la sesión. Se envía en cada petición en la cabecera X-Usuario-Id,
 // igual que la guía envía la cabecera X-DB-Provider.
@@ -13,6 +18,9 @@ export function usarUsuario(idUsuario) {
 }
 
 export async function apiRequest(url, options = {}) {
+  if (!URL_API || !URL_USUARIOS) {
+    throw new Error("Falta configurar la URL de la API");
+  }
   const { method = "GET", body } = options;
   let response = null;
   try {

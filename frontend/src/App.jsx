@@ -10,6 +10,7 @@ import Producto from "./pages/Producto";
 import Login from "./pages/Login";
 import Perfil from "./pages/Perfil";
 import { guardarDato, leerDato } from "./js/almacenamiento";
+import { vigilarVentas } from "./services/notificaciones";
 import {
   usarUsuario,
   categoriasApi,
@@ -112,6 +113,9 @@ export default function App() {
 
     cargarProductos();
   }, []);
+
+  // Hito 4: avisa en el celular cuando alguien pide un producto de quien tiene la sesión
+  useEffect(() => (idUsuario === null ? undefined : vigilarVentas(idUsuario)), [idUsuario]);
 
   function reemplazarProducto(productoActualizado) {
     setProductos(productos.map((item) => {
